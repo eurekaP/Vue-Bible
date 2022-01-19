@@ -1,5 +1,5 @@
 <template>
-    <div class="col bible" style="height: 100%;overflow: scroll;padding-bottom: 46px;">
+    <div class="col bible" style="height: 100%;overflow-y: scroll;padding-bottom: 46px;">
         <div class="sticky-top sticky" style="background: #ffffff;padding-top: 4px;">
             <div class="row sticky-top">
                 <div class="col"><button class="btn btn-light" type="button"><i class="icon ion-ios-arrow-back"></i></button></div>
@@ -14,7 +14,14 @@
                     </select><button class="btn btn-light" type="button"><i class="icon ion-ios-arrow-forward"></i></button></div>
             </div>
         </div>
-        <p class="text-center" v-html="bibble_text">&nbsp;
+        <div class="d-flex" style="justify-content: right;">
+            <i class="fa fa-align-left align-button" v-bind:class="{'active-align': alignment == 'left'}" v-on:click="setAlignment('left')"></i>
+            <i class="fa fa-align-center align-button" v-bind:class="{'active-align': alignment == 'center'}" v-on:click="setAlignment('center')"></i>
+            <i class="fa fa-align-right align-button" v-bind:class="{'active-align': alignment == 'right'}" v-on:click="setAlignment('right')"></i>
+            <i class="fa fa-list-ol align-button" v-bind:class="{'active-align': alignment == 'justify'}" v-on:click="setAlignment('justify')"></i>
+
+        </div>
+        <p id="bible-text" v-bind:class="[(alignment == 'left' || alignment == 'justify') ? 'text-start' : (alignment == 'center' ? 'text-center' : 'text-end')]" v-html="bibble_text">&nbsp;
             <span>
                 <span style="font-size: 9px;font-weight: bold;margin: 4px;color: #0067ff;">1</span>
                 In the beginning God created the heaven and the earth.
@@ -25,7 +32,7 @@
             <div class="row sticky-top">
                 <div class="col"><button class="btn btn-light" type="button"><i class="icon ion-ios-arrow-back"></i></button></div>
                 <div class="col">
-                    <h4 class="text-center text-info sticky-top" style="background: #ffffff;">Genesis 1</h4>
+                    <h4 class="text-center text-info sticky-top" style="background: #ffffff;" >{{ chapterLabel }}</h4>
                 </div>
                 <div class="col text-end"><button class="btn btn-light" type="button"><i class="icon ion-ios-arrow-forward"></i></button></div>
             </div>
@@ -43,17 +50,26 @@ export default {
             gensis_filter : '',
             bibble_text: '&nbsp;',
             translation: 'kjv',
+            alignment: 'center',
+            bookLabel: [],
+            chapterLabel: 'Genesis 1',
         }
     },
     components: {
 
     },
     mounted(){
-        console.log(this.translation);
-        console.log(this.gensis_filter);
         this.gensis_filter = 'Genisis 1:1';
-        
         this.updateBibleArea(this.gensis_filter);
+
+        this.axios.get(config.API_LOCATION + 'bible-book-numbers')
+        .then((response) => {
+            this.bookLabel = response.data;
+            console.log(this.bookLabel[1]);
+        })
+        .catch(function (error) {
+            console.log(error) // error log
+        })
     },
     methods: {
         filterChange: function(){
@@ -67,20 +83,73 @@ export default {
             this.axios.get(config.API_LOCATION + 'bible-input2/' + this.translation + '/' + filter_str)
                 .then((response) => {
                     // this.college_detail = response.data;  //put into data variable
-                    console.log(response.data);
+                    // console.log(response.data);
                     var _bibble_text =  '&nbsp';
                     if(response.data.length > 0)
                         _chapter = response.data[0]['chapter'];
 
+                    var chapterLabel = this.bookLabel[response.data[0]['book']] + ' ' + _chapter;
+                    this.chapterLabel = chapterLabel;
+
                     for(var i = 0; i < response.data.length; i++)
                     {
-                        _bibble_text += '<span><span style="font-size: 9px;font-weight: bold;margin: 4px;color: #0067ff;">' + response.data[i]['verse'] + '</span>' + response.data[i]['text'] + '</span>';   
+                        _bibble_text += '<span class="single-bible"><span style="font-size: 9px;font-weight: bold;margin: 4px;color: #0067ff;">' + response.data[i]['verse'] + '</span>' + response.data[i]['text'] + '</span>';   
                     }
                     this.bibble_text = _bibble_text;
                 })
                 .catch(function (error) {
                     console.log(error) // error log
                 })
+        },
+        setAlignment: function(_alignment) {
+            this.alignment = _alignment;
+            
+            if(_alignment == 'justify')
+            {
+                this.axios.get(config.API_LOCATION + 'bible-input2/' + this.translation + '/' + this.gensis_filter)
+                    .then((response) => {
+                        var _bibble_text =  '&nbsp';
+
+                        for(var i = 0; i < response.data.length; i++)
+                        {
+                            _bibble_text += '<span class="single-bible"><span style="font-size: 9px;font-weight: bold;margin: 4px;color: #0067ff;">' + response.data[i]['verse'] + '</span>' + response.data[i]['text'] + '</span><br>';   
+                        }
+                        this.bibble_text = _bibble_text;
+                    })
+                    .catch(function (error) {
+                        console.log(error) // error log
+                    })
+            }else {
+                this.axios.get(config.API_LOCATION + 'bible-input2/' + this.translation + '/' + this.gensis_filter)
+                    .then((response) => {
+                        var _bibble_text =  '&nbsp';
+
+                        for(var i = 0; i < response.data.length; i++)
+                        {
+                            _bibble_text += '<span class="single-bible"><span style="font-size: 9px;font-weight: bold;margin: 4px;color: #0067ff;">' + response.data[i]['verse'] + '</span>' + response.data[i]['text'] + '</span>';   
+                        }
+                        this.bibble_text = _bibble_text;
+                    })
+                    .catch(function (error) {
+                        console.log(error) // error log
+                    })
+            }
+            // if(_alignment == 'justify')
+            // {   
+            //     var div = document.getElementsByClassName("single-bible");
+            //     for(var i = 0; i < div.length - 1; i++)
+            //     {
+            //         var el = document.createElement("br");
+            //         div[i].parentNode.insertBefore(el, div[i].nextSibling);
+            //     }
+            // } else {
+            //     const bibleText = document.getElementById("bible-text");
+            //     var spans = bibleText.children;
+            //     for(var i = 0; i < spans.length; i++){
+            //         if(spans[i].tagName == "BR")
+            //             spans[i].remove();
+            //     }
+            // }
         }
     }
 
@@ -88,7 +157,24 @@ export default {
 </script>
 
 <style lang="scss">
+    .align-button {
+        border: solid 1px gray;
+        padding: 5px;
+        margin: 5px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .active-align {
+        color: var(--bs-blue) !important;
+    }
+
     .bible {
         max-width: 66.6666667%;
+    }
+    @media(max-width:992px) {
+        .bible {
+            max-width: 100% !important;
+        }    
     }
 </style>

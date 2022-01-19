@@ -1,8 +1,9 @@
 <template>
     <div class="container" style="height: 100vh;padding-top: 39px;">
-        <div class="row d-flex justify-content-lg-center" style="height: 100vh;">
-            <!-- <bible></bible> -->
+        <div class="row d-flex justify-content-center" style="height: 100vh;">
             <bible></bible>
+            <bible v-if="layoutMode > 1 ? true : false"></bible>
+            <bible v-if="layoutMode > 2 ? true : false"></bible>
             <!-- <div class="col-md-4 col-2" id="content" style="border-bottom-color: rgb(0,128,255);height: 95vh;padding-bottom: 50px;">
                 <div>
                     <div class="table-responsive">
@@ -259,6 +260,17 @@ export default {
     name: 'Home',
     components: {
         Bible
-    }
+    },
+    mounted(){
+        this.$root.$on('eventing', _layoutMode => {
+            // console.log(layoutMode);
+            this.layoutMode = _layoutMode;
+        });
+    },
+    data () {
+        return {
+            layoutMode : 1,
+        }
+    },
 }
 </script>

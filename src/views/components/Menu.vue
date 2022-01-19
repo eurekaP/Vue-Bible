@@ -4,21 +4,21 @@
             <div class="collapse navbar-collapse" id="navcol-1">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" href="Bible-1.html">
+                        <a class="nav-link" v-bind:class="{active1: layoutMode == 1}" v-on:click="clickTwoLayout(1)">
                             <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-square ">
                                 <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"></path>
                             </svg>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
+                    <li class="nav-item  d-none d-sm-block">
+                        <a class="nav-link" v-bind:class="{active1: layoutMode == 2}" v-on:click="clickTwoLayout(2)">
                             <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-layout-split">
                                 <path d="M0 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3zm8.5-1v12H14a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H8.5zm-1 0H2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h5.5V2z"></path>
                             </svg>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#12">
+                    <li class="nav-item d-none d-md-block">
+                        <a class="nav-link" v-bind:class="{active1: layoutMode == 3}" v-on:click="clickTwoLayout(3)">
                             <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-layout-three-columns">
                                 <path d="M0 1.5A1.5 1.5 0 0 1 1.5 0h13A1.5 1.5 0 0 1 16 1.5v13a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 14.5v-13zM1.5 1a.5.5 0 0 0-.5.5v13a.5.5 0 0 0 .5.5H5V1H1.5zM10 15V1H6v14h4zm1 0h3.5a.5.5 0 0 0 .5-.5v-13a.5.5 0 0 0-.5-.5H11v14z"></path>
                             </svg>
@@ -50,6 +50,28 @@
 </template>
 
 <script>    // Home screen vue - no scripts (There are only UI)
+    export default {
+        data() {
+            return  {
+                layoutMode: 1,
+            };
+        },
+        name: 'Menu',
+        components: {
 
+        },
+        methods: {
+            clickTwoLayout: function(_layoutMode){
+                this.layoutMode = _layoutMode;
+                this.$root.$emit('eventing', _layoutMode);
+            }
+        }
+    }
 </script>
+
+<style lang="scss">
+    .nav-link.active1 {
+        color: var(--bs-blue) !important;
+    }
+</style>
 
