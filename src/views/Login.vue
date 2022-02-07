@@ -1,30 +1,20 @@
 <template>
-  <div>
-    <h1>Log In</h1>
-    <div class="container">
-      <div class="row">
-        <div class="col-sm">
+   
+    <div class="container clean-block clean-form dark">
+        <div class="block-heading">
+            <h2 class="text-info">Log In</h2>
         </div>
-        <div class="col-sm">
-          <form @submit.prevent="onSubmit">
-            <div class="form-group">
-              <label for="exampleInputEmail1">Email address</label>
-              <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email" v-model="email">
-              <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-            </div>
-            <div class="form-group">
-              <label for="exampleInputPassword1">Password</label>
-              <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" v-model="password">
-            </div>
-            <button type="submit" class="btn btn-primary mt-5">Log In</button>
-          </form>
-        </div>
-        <div class="col-sm">
-        </div>
-      </div>
+        <form>
+            <p v-show="!login_success" class="text-danger">The credential is incorrect. </br> Please check your username and password.</p>
+            <div class="mb-3"><label class="form-label" for="email">Username</label><input class="form-control item" type="text" id="email" v-model="email"></div>
+            <div class="mb-3"><label class="form-label" for="password">Password</label><input class="form-control" type="password" id="password" v-model="password"></div>
+            <div class="mb-3"><a href="https://worshify.com/create/account">Sign Up</a></div>
+            <button class="btn btn-primary" type="button" @click="onSubmit">Log In</button>
+            <router-link to="/">
+              <button class="btn btn-secondary" type="button" style="margin-left:50px;"><i class="fa fa-home"></i>Home</button>
+            </router-link>
+        </form>
     </div>
-
-  </div>
 </template>
 
 <script>
@@ -35,34 +25,54 @@ export default {
   data() {
       return {
         email: '',
-        password: ''
+        password: '',
+        login_success: true,
       };
   },
   methods: {
     onSubmit () {
+      let self = this;
 
       const params = new URLSearchParams(); // Add params for api endpoint
-      params.append('email', this.email);   // Add email
+      params.append('username', this.email);   // Add email
       params.append('password', this.password); // Add password
 
       // Call Sign In API to check credentials and perform login module
 
-      this.axios.post(config.API_LOCATION + '/Auth/sign_in', params, {headers: {
+      this.axios.post('https://worshify.com/login/biblify', params, {headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       }})
       .then((response) => {
-          if(response.data != "failed") // if log in success set variables in Local storage
-          {
-            localStorage.setItem('authenticated', true);  // authenticated flag
-            localStorage.setItem('userEmail', this.email);  // current logged in user email
-            localStorage.setItem('userId', response.data);  // currently logged in user id
-            this.$router.push({ name: 'card' });    // After finish login, go to card page
-          }else{
-            alert("Wrong Credentials!");
-          }
+          console.log("Response: ", response);
+          localStorage.setItem('authenticated', true);
+          localStorage.setItem('accessToken', response.data.token);
+          localStorage.setItem('avatar', response.data.img);
+          localStorage.setItem('username', response.data.username);
+          localStorage.setItem('userID', response.data.userID);
+
+          this.$root.$emit('refreshAuthenticate');
+          
+          self.login_success = true;
+          self.$router.push({ name: 'home' });    // After finish login, go to home page
+
+          // if(response.data != "failed") // if log in success set variables in Local storage
+          // {
+          //   localStorage.setItem('authenticated', true);  // authenticated flag
+          //   localStorage.setItem('userEmail', this.email);  // current logged in user email
+          //   localStorage.setItem('userId', response.data);  // currently logged in user id
+          //   this.$router.push({ name: 'card' });    // After finish login, go to card page
+          // }else{
+          //   alert("Wrong Credentials!");
+          // }
       })
       .catch(function (error) {
-          console.log(error);
+          if(error.response.status === 401)
+          {
+            console.log("This credential is not matched");
+            localStorage.setItem('authenticated', true);
+            self.login_success = false;
+          }
+          console.log(error.response);
       });
     }
   }

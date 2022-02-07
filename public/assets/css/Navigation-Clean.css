@@ -165,7 +165,7 @@
 }
 
 #content {
-  overflow-x: scroll;
+  overflow-y: scroll;
 }
 
 .sticky {
@@ -173,17 +173,60 @@
   position: sticky;
 }
 
-span:hover + .hide {
+/* span:hover + .hide {
   color: var(--bs-red);
-}
+} */
 
 .hide {
   display: none;
 }
 
-span:hover {
+.fragment:hover {
   color: var(--bs-red);
-  cursor: pointer;
-  border-bottom: solid 1px var(--bs-red);
+    cursor: pointer;
+  /* border-bottom: solid 1px var(--bs-red); */
 }
 
+.verseBranch:hover {
+  color: var(--bs-red);
+  cursor: pointer;
+}
+
+.note {
+  line-height: 1.5em;
+  height: 3em;
+}
+
+#contacts {
+  overflow-x: scroll;
+  height: 100%;
+}
+
+.bible-button:hover {
+  background: #465765;
+  color: white;
+}
+
+.bible-button {
+  background: #e4ecff;
+}
+
+#notes-tool {
+}
+
+@media (min-width: 992px) {
+  #notes-tool {
+    left: 20%;
+    width: 60%;
+  }
+
+  #chat-tool {
+    left: 20%;
+    width: 60%;
+  }
+
+  #strongs-tool{
+    left: 20%;
+    width: 60%;
+  }
+}
